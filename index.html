@@ -19,12 +19,12 @@
     <div class="menu-bottom">
         <label class="mode-switch">
             Count Up
-          <input type="checkbox" id="modeToggle" onchange="toggleMode()">
+          <input type="checkbox" id="modeToggle" onchange="toggleMode()" checked>
           <span class="slider"></span>
           <span class="mode-label" id="modeLabel">Count Down</span>
         </label>
-        <input type="number" id="turnDuration" placeholder="Turn time (sec)">
-        <button type="button" onclick="resetAll()" id="resetAllBtn" style="display: none;">Reset All</button>
+        <input type="number" id="turnDuration" placeholder="Turn time (sec)" value="90">
+        <button type="button" onclick="resetAll()" id="resetAllBtn">Reset All</button>
       </div>
   </div>
   <div id="mainScreen" class="screen active">

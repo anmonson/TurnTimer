@@ -8,6 +8,8 @@ function toggleScreen() {
   
 	const menuButton = document.querySelector(".menu-button:not(.close-button)");
 	const closeButton = document.querySelector(".menu-button.close-button");
+
+	
   
 	if (isOpening) {
 	  menuButton.style.display = "none";
@@ -18,17 +20,47 @@ function toggleScreen() {
 	}
   }
   
-  let players = ["Alice", "Bob", "Charlie", "Dana"];
+  let players = ["andy", "joel fishman", "sapenis", "big bruce", "pbg", "lil willy with the lil willy"];
   let timers = [];
   let currentIndex = 0;
   let interval = null;
-  let countingDown = false;
-  let duration = 30;
+  let countingDown = true;
+let duration = 90;
   
+let lastFlashedSecond = null;
   let menuButton;
   let closeButton;
   
+  
   document.addEventListener("DOMContentLoaded", () => {
+	document.addEventListener("keydown", (e) => {
+		if (e.code === "Space") {
+		  e.preventDefault();
+		  nextPlayer();
+		} else if (e.code === "Backspace") {
+		  e.preventDefault();
+		  prevPlayer();
+		}
+	  });
+
+	  function prevPlayer() {
+		const track = document.querySelector(".carousel-track");
+		const card = track.querySelector(".player-card");
+		card.classList.add("slide-out");
+		card.addEventListener("transitionend", () => {
+		  currentIndex = (currentIndex - 1 + players.length) % players.length;
+		  renderCarousel();
+		  const newCard = document.querySelector(".player-card");
+		  newCard.classList.add("slide-in");
+		  requestAnimationFrame(() => {
+			newCard.classList.remove("slide-in");
+		  });
+		}, { once: true });
+	  }
+	
+	  window.prevPlayer = prevPlayer;
+	  
+
 	const carousel = document.getElementById("carousel");
   
 	function initTimers() {
@@ -36,40 +68,31 @@ function toggleScreen() {
 	}
   
 	function renderCarousel() {
-	  const carousel = document.getElementById("carousel");
-	  carousel.innerHTML = '<div class="carousel-track"></div>';
-	  const track = carousel.querySelector('.carousel-track');
-
-	  const getCard = (index, isCurrent) => {
-		const div = document.createElement("div");
-		div.className = "player-card" + (isCurrent ? " current" : "");
-		div.innerHTML = `
-		  <div class="player-name">${players[index]}</div>
-		  <div class="timer" id="timer-${index}">${formatTime(timers[index])}</div>
-		  ${isCurrent ? `<button class="pause-button${interval ? ' paused' : ''}">${interval ? "⏸️" : "▶️"}</button>` : ''}
-		`;
-		return div;
-	  };
-
-	  const prev = (currentIndex - 1 + players.length) % players.length;
-	  const next = (currentIndex + 1) % players.length;
-
-	  track.appendChild(getCard(prev, false));
-	  track.appendChild(getCard(currentIndex, true));
-	  track.appendChild(getCard(next, false));
-
-	  const newPauseBtn = track.querySelector(".player-card.current .pause-button");
-	  if (newPauseBtn) {
-		newPauseBtn.addEventListener("click", toggleTimer);
-	  }
-
-	  track.style.transition = "none";
-      track.style.transform = "translateX(0%)";
+      const carousel = document.getElementById("carousel");
+      carousel.innerHTML = '<div class="carousel-track"></div>';
+      const track = carousel.querySelector('.carousel-track');
+      const div = document.createElement("div");
+      timers[currentIndex] = countingDown ? duration : 0;
+      div.className = "player-card current";
+      div.innerHTML = `
+        <div class="player-name">${players[currentIndex]}</div>
+        <div class="timer" id="timer-${currentIndex}">${formatTime(timers[currentIndex])}</div>
+        <button class="pause-button large-button${interval ? ' paused' : ''}">${interval ? "⏸" : "⏵"}</button>
+      `;
+      track.appendChild(div);
+      const pauseBtn = track.querySelector(".pause-button");
+      pauseBtn.addEventListener("click", toggleTimer);
+      // start continuous gradient animation on the new card
+      const card = document.querySelector(".player-card.current");
+      card.style.setProperty('--duration', `${duration}s`);
+      card.style.setProperty('--progress-angle', `360deg`);
+      card.classList.add('animate');
+	  card.style.setProperty('--progress-angle', `360deg`);
 	}
   
 	function formatTime(sec) {
 	  const m = Math.floor(sec / 60);
-	  const s = sec % 60;
+	  const s = Math.floor(sec % 60);
 	  return `${m}:${s.toString().padStart(2, "0")}`;
 	}
   
@@ -80,13 +103,13 @@ function toggleScreen() {
 	    interval = null;
 	    if (pauseBtn) {
 	      pauseBtn.classList.remove("paused");
-	      pauseBtn.innerHTML = "▶️";
+	      pauseBtn.innerHTML = "⏵"; // sleek play icon
 	    }
 	  } else {
 	    interval = setInterval(() => {
 	      if (countingDown) {
 	        if (timers[currentIndex] > 0) {
-	          timers[currentIndex]--;
+				timers[currentIndex] = Math.max(0, timers[currentIndex] - 0.1);
 	        } else {
 	          // Turn is over
 	          clearInterval(interval);
@@ -95,62 +118,75 @@ function toggleScreen() {
 	          return;
 	        }
 	      } else {
-	        timers[currentIndex]++;
+			timers[currentIndex] += 0.1;
 	      }
 	      updateTimerDisplay();
-	    }, 1000);
+	      const card = document.querySelector(".player-card.current");
+		if (card && countingDown) {
+  const percent = timers[currentIndex] / duration;
+  const angle = 360 * percent;
+  card.style.setProperty('--progress-angle', `${angle}deg`);
+
+  const timeLeft = timers[currentIndex];
+  const secondsLeft = Math.floor(timeLeft);
+			
+  const tensecbeep = new Audio('sounds/10secondding.mp3')
+  const threesecbeep = new Audio('sounds/4secondbeep.mp3');  
+
+  card.classList.remove("solid-red");
+
+  if (timeLeft <= 0.1) {
+    card.classList.remove("flash-red");
+    card.classList.add("solid-red");
+    clearInterval(interval);
+    interval = null;
+  }  else if (secondsLeft == 10) {
+    tensecbeep.play();
+    lastFlashedSecond = 10;
+}else if ([5, 4, 3, 2, 1].includes(secondsLeft)) {
+    if (secondsLeft !== lastFlashedSecond) {
+      card.classList.remove("flash-red");
+      void card.offsetWidth; // force reflow
+      card.classList.add("flash-red");
+      setTimeout(() => {
+        card.classList.remove("flash-red");
+      }, 400);
+      lastFlashedSecond = secondsLeft;
+	  if(secondsLeft == 3){
+		threesecbeep.play(); 
+	  }
+    }
+  } 
+}else {
+    card.classList.remove("flash-red");
+  
+}
+	    }, 100);
 	    if (pauseBtn) {
 	      pauseBtn.classList.add("paused");
-	      pauseBtn.innerHTML = "⏸️";
+	      pauseBtn.innerHTML = "⏸"; // sleek pause icon
 	    }
 	  }
 	}
   
 	function updateTimerDisplay() {
 	  const timerEl = document.getElementById(`timer-${currentIndex}`);
-	  if (timerEl) timerEl.textContent = formatTime(timers[currentIndex]);
-	}
-  
-	function prevPlayer() {
-       const track = document.querySelector(".carousel-track");
-       if (!track) return;
-       const firstCard = track.children[0];
-       const cardWidth = parseFloat(getComputedStyle(firstCard).width);
-       const gap = parseFloat(getComputedStyle(track).gap) || 0;
-       const offset = cardWidth + gap;
-       track.style.transition = "none";
-       track.style.transform = "translateX(0)";
-       track.getBoundingClientRect(); // force reflow
-       track.style.transition = "transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1)";
-       track.style.transform = `translateX(${offset}px)`;
-       track.addEventListener("transitionend", () => {
-         track.style.transition = "none";
-         track.style.transform = "translateX(0)";
-         currentIndex = (currentIndex - 1 + players.length) % players.length;
-         if (countingDown) timers[currentIndex] = duration;
-         renderCarousel();
-       }, { once: true });
+  if (timerEl) timerEl.textContent = formatTime(timers[currentIndex]);
 	}
   
 	function nextPlayer() {
-       const track = document.querySelector(".carousel-track");
-       if (!track) return;
-       const firstCard = track.children[0];
-       const cardWidth = parseFloat(getComputedStyle(firstCard).width);
-       const gap = parseFloat(getComputedStyle(track).gap) || 0;
-       const offset = cardWidth + gap;
-       track.style.transition = "none";
-       track.style.transform = "translateX(0)";
-       track.getBoundingClientRect(); // force reflow
-       track.style.transition = "transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1)";
-       track.style.transform = `translateX(-${offset}px)`;
-       track.addEventListener("transitionend", () => {
-         track.style.transition = "none";
-         track.style.transform = "translateX(0)";
-         currentIndex = (currentIndex + 1) % players.length;
-         if (countingDown) timers[currentIndex] = duration;
-         renderCarousel();
-       }, { once: true });
+    const track = document.querySelector(".carousel-track");
+    const card = track.querySelector(".player-card");
+    card.classList.add("slide-out");
+    card.addEventListener("transitionend", () => {
+      currentIndex = (currentIndex + 1) % players.length;
+      renderCarousel();
+      const newCard = document.querySelector(".player-card");
+      newCard.classList.add("slide-in");
+      requestAnimationFrame(() => {
+        newCard.classList.remove("slide-in");
+      });
+    }, { once: true });
 	}
   
 	function resetTimer() {
@@ -234,7 +270,6 @@ function toggleScreen() {
 	  }
 	});
   
-	window.prevPlayer = prevPlayer;
 	window.nextPlayer = nextPlayer;
 	window.toggleTimer = toggleTimer;
 	window.resetTimer = resetTimer;
@@ -278,15 +313,7 @@ function toggleScreen() {
 	mainScreen.insertBefore(menuButton, carousel);
   
 	carousel.addEventListener("click", (e) => {
-	  if (e.target.classList.contains("pause-button")) return;
-
-	  const clickedCard = e.target.closest(".player-card");
-	  const cards = document.querySelectorAll(".player-card");
-
-	  if (clickedCard === cards[0]) {
-	    prevPlayer();
-	  } else {
-	    nextPlayer();
-	  }
-	});
+    if (e.target.classList.contains("pause-button")) return;
+    nextPlayer();
+  });
   });
