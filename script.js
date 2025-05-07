@@ -20,7 +20,7 @@ function toggleScreen() {
 	}
   }
   
-  let players = ["andy", "joel fishman", "sapenis", "big bruce", "pbg", "lil willy with the lil willy"];
+  let players = ["andy", "jake", "will", "justin"];
   let timers = [];
   let currentIndex = 0;
   let interval = null;
