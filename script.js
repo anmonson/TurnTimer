@@ -40,6 +40,9 @@ let lastFlashedSecond = null;
 		} else if (e.code === "Backspace") {
 		  e.preventDefault();
 		  prevPlayer();
+		} else if (e.key === "p" || e.code === "KeyP") {
+		  e.preventDefault();
+		  toggleTimer();
 		}
 	  });
 
