@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/TurnTimer/static/css/main.05965c96.css",
+    "main.js": "/TurnTimer/static/js/main.766d920c.js",
+    "static/js/453.9a9cf3d7.chunk.js": "/TurnTimer/static/js/453.9a9cf3d7.chunk.js",
+    "index.html": "/TurnTimer/index.html",
+    "main.05965c96.css.map": "/TurnTimer/static/css/main.05965c96.css.map",
+    "main.766d920c.js.map": "/TurnTimer/static/js/main.766d920c.js.map",
+    "453.9a9cf3d7.chunk.js.map": "/TurnTimer/static/js/453.9a9cf3d7.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.05965c96.css",
+    "static/js/main.766d920c.js"
+  ]
+}
