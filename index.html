@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8" >
   <meta name="viewport" content="width=device-width, initial-scale=1.0" >
@@ -7,6 +7,8 @@
   <link rel="stylesheet" href="styles.css" >
 </head>
 <body>
+  <button class="theme-toggle" onclick="toggleTheme()">🌞</button>
+
   <div id="setupScreen" class="shelf">
     <div class="player-menu">
         <br>
@@ -17,12 +19,17 @@
       </div>
     </div>
     <div class="menu-bottom">
-        <label class="mode-switch">
-            Count Up
-          <input type="checkbox" id="modeToggle" onchange="toggleMode()" checked>
-          <span class="slider"></span>
-          <span class="mode-label" id="modeLabel">Count Down</span>
+      <div class="count-toggle">
+        <span>Count Up</span>
+        <label>
+          <input type="checkbox" id="countModeToggle" />
+          <span class="count-slider"></span>
         </label>
+        <span>Count Down</span>
+      </div>
+      
+      
+      
         <input type="number" id="turnDuration" placeholder="Turn time (sec)" value="90">
         <button type="button" onclick="resetAll()" id="resetAllBtn">Reset All</button>
       </div>
@@ -38,6 +45,7 @@
       <div>P: Pause/Play</div>
     </div>
   </div>
+  
 
 
   <script src="script.js"></script>

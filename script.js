@@ -18,7 +18,7 @@ function toggleScreen() {
   }
 }
 
-let players = ["andy", "jake", "will", "justin"];
+let players = ["Samantha", "Hannah", "Ariel", "Emma"];
 let timers = [];
 let currentIndex = 0;
 let interval = null;
@@ -423,6 +423,21 @@ document.addEventListener("DOMContentLoaded", () => {
       renderCarousel();
     }
   }
+
+  function toggleTheme() {
+    const current = document.documentElement.getAttribute('data-theme') || 'light';
+    const next = current === 'light' ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+    document.querySelector('.theme-toggle').innerText = next === 'dark' ? '🌙' : '🌞';
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const saved = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', saved);
+    const toggleBtn = document.querySelector('.theme-toggle');
+    if (toggleBtn) toggleBtn.innerText = saved === 'dark' ? '🌙' : '🌞';
+  });
 
   document.getElementById("turnDuration").addEventListener("input", (e) => {
     const val = parseInt(e.target.value);
